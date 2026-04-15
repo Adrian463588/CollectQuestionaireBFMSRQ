@@ -28,7 +28,8 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		ServerPort:     getEnv("SERVER_PORT", "8080"),
+		ServerPort:     getEnv("PORT", getEnv("SERVER_PORT", "8080")),
+		DatabaseURL:    os.Getenv("DATABASE_URL"),
 		DBHost:         getEnv("DB_HOST", "localhost"),
 		DBPort:         getEnv("DB_PORT", "5432"),
 		DBUser:         getEnv("DB_USER", "postgres"),
