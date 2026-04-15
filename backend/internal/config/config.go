@@ -35,7 +35,11 @@ func LoadConfig() *Config {
 		DBUser:         getEnv("DB_USER", "postgres"),
 		DBPassword:     getEnv("DB_PASSWORD", "postgres"),
 		DBName:         getEnv("DB_NAME", "questionnaire_db"),
-		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedOrigins: []string{
+			"http://localhost:3000",
+			"https://bfmsrqsurvey.edgeone.dev",
+			"https://bfmsrqsurvey.edgeone.dev/", // Just in case
+		},
 	}
 }
 
