@@ -70,6 +70,7 @@ func run() error {
 	// Participant routes
 	api.Post("/participants", handler.CreateParticipant)
 	api.Get("/participants/:id", handler.GetParticipant)
+	api.Delete("/participants/:id", handler.DeleteParticipant)
 
 	// Response routes
 	api.Post("/responses", handler.SubmitResponse)

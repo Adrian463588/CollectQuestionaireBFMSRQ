@@ -79,3 +79,11 @@ export type DashboardItem = {
 export async function fetchAllDashboardData(): Promise<DashboardItem[]> {
   return apiFetch<DashboardItem[]>("/dashboard");
 }
+
+/**
+ * Soft-deletes a participant and all associated responses/scores.
+ * The data is retained in the database for research audit purposes.
+ */
+export async function deleteParticipant(id: string): Promise<void> {
+  await apiFetch(`/participants/${id}`, { method: "DELETE" });
+}

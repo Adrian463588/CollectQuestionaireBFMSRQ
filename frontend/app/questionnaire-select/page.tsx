@@ -16,6 +16,7 @@ export default function QuestionnaireSelect() {
     if (!participant) {
       router.push("/");
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoaded(true);
     }
   }, [router]);

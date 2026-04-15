@@ -1,3 +1,4 @@
+// Package utils provides shared utilities for data export.
 package utils
 
 import (
@@ -8,243 +9,147 @@ import (
 	"backend/internal/models"
 )
 
-// ExportToCSV exports participant data, responses, and scores to CSV format
-func ExportToCSV(
-	participant *models.Participant,
-	score *models.Score,
-) (string, error) {
-	var builder strings.Builder
-	writer := csv.NewWriter(&builder)
+// csvHeaders defines every column in the exported CSV.
+// This single source of truth ensures header and row are always in sync (DRY).
+var csvHeaders = []string{
+	// ── Participant ─────────────────────────────────────────────────────────
+	"Participant ID",
+	"Name",
+	"Age",
+	"Gender",
+	"Created At",
+	// ── SRQ-29: domain scores ───────────────────────────────────────────────
+	"SRQ Neurotic Score (Q1-20)",
+	"SRQ Neurotic Status",
+	"SRQ Substance Use (Q21)",
+	"SRQ Psychotic (Q22-24)",
+	"SRQ Psychotic Count",
+	"SRQ PTSD (Q25-29)",
+	"SRQ PTSD Count",
+	"SRQ Total Score (Q1-29)",
+	"SRQ Overall Risk",
+	// ── SRQ-29: dummy variables (0/1) for research ─────────────────────────
+	"SRQ GME_Dummy",
+	"SRQ Substance_Dummy",
+	"SRQ Psychotic_Dummy",
+	"SRQ PTSD_Dummy",
+	// ── IPIP-BFM-50: mean scores (1.0–5.0) ─────────────────────────────────
+	"IPIP Extraversion Mean",
+	"IPIP Agreeableness Mean",
+	"IPIP Conscientiousness Mean",
+	"IPIP Emotional Stability Mean",
+	"IPIP Intellect Mean",
+	// ── IPIP-BFM-50: interpretation labels ─────────────────────────────────
+	"IPIP Extraversion Label",
+	"IPIP Agreeableness Label",
+	"IPIP Conscientiousness Label",
+	"IPIP Emotional Stability Label",
+	"IPIP Intellect Label",
+	// ── IPIP-BFM-50: raw sum scores (10–50) ────────────────────────────────
+	"IPIP Extraversion Sum",
+	"IPIP Agreeableness Sum",
+	"IPIP Conscientiousness Sum",
+	"IPIP Emotional Stability Sum",
+	"IPIP Intellect Sum",
+}
 
-	// Write header
-	header := []string{
-		"Participant ID",
-		"Name",
-		"Age",
-		"Gender",
-		"Created At",
+// ExportToCSV exports a single participant's data and scores to a CSV string.
+func ExportToCSV(participant *models.Participant, score *models.Score) (string, error) {
+	var b strings.Builder
+	w := csv.NewWriter(&b)
+
+	if err := w.Write(csvHeaders); err != nil {
+		return "", fmt.Errorf("write CSV header: %w", err)
+	}
+	if err := w.Write(buildRecord(participant, score)); err != nil {
+		return "", fmt.Errorf("write CSV record: %w", err)
 	}
 
-	// Add SRQ-29 headers if exists
+	w.Flush()
+	return b.String(), w.Error()
+}
+
+// ExportMultipleToCSV exports all participants to a single CSV string.
+// scores[i] corresponds to participants[i]; a nil score means no data yet.
+func ExportMultipleToCSV(participants []*models.Participant, scores []*models.Score) (string, error) {
+	var b strings.Builder
+	w := csv.NewWriter(&b)
+
+	if err := w.Write(csvHeaders); err != nil {
+		return "", fmt.Errorf("write CSV header: %w", err)
+	}
+
+	for i, p := range participants {
+		var score *models.Score
+		if i < len(scores) {
+			score = scores[i]
+		}
+		if err := w.Write(buildRecord(p, score)); err != nil {
+			return "", fmt.Errorf("write CSV record for participant %s: %w", p.ID, err)
+		}
+	}
+
+	w.Flush()
+	return b.String(), w.Error()
+}
+
+// buildRecord constructs a CSV row matching the order of csvHeaders.
+// Empty strings are used for absent data — no dummy/placeholder values.
+func buildRecord(p *models.Participant, score *models.Score) []string {
+	row := make([]string, len(csvHeaders))
+
+	// ── Participant ─────────────────────────────────────────────────────────
+	row[0] = p.ID
+	row[1] = p.Name
+	row[2] = fmt.Sprintf("%d", p.Age)
+	row[3] = p.Gender
+	row[4] = p.CreatedAt.Format("2006-01-02 15:04:05")
+
+	// ── SRQ-29 ─────────────────────────────────────────────────────────────
 	if score != nil && score.SRQScore != nil {
-		header = append(header,
-			"SRQ Neurotic Score",
-			"SRQ Neurotic Status",
-			"SRQ Substance Use",
-			"SRQ Psychotic",
-			"SRQ PTSD",
-			"SRQ Classification",
-		)
+		s := score.SRQScore
+		row[5] = fmt.Sprintf("%d", s.NeuroticScore)
+		row[6] = s.NeuroticStatus
+		row[7] = boolStr(s.SubstanceUse)
+		row[8] = boolStr(s.Psychotic)
+		row[9] = fmt.Sprintf("%d", s.PsychoticCount)
+		row[10] = boolStr(s.PTSD)
+		row[11] = fmt.Sprintf("%d", s.PTSDCount)
+		row[12] = fmt.Sprintf("%d", s.TotalScore)
+		row[13] = s.OverallRisk
+		row[14] = fmt.Sprintf("%d", s.EmotionalDisorder)
+		row[15] = fmt.Sprintf("%d", s.SubstanceDummy)
+		row[16] = fmt.Sprintf("%d", s.PsychoticDummy)
+		row[17] = fmt.Sprintf("%d", s.PTSDDummy)
 	}
 
-	// Add IPIP-BFM-50 headers if exists
+	// ── IPIP-BFM-50 ─────────────────────────────────────────────────────────
 	if score != nil && score.IPIPScore != nil {
-		header = append(header,
-			"IPIP Extraversion",
-			"IPIP Agreeableness",
-			"IPIP Conscientiousness",
-			"IPIP Emotional Stability",
-			"IPIP Intellect",
-			"IPIP Dominant Trait",
-		)
+		ip := score.IPIPScore
+		row[18] = fmt.Sprintf("%.2f", ip.Extraversion)
+		row[19] = fmt.Sprintf("%.2f", ip.Agreeableness)
+		row[20] = fmt.Sprintf("%.2f", ip.Conscientiousness)
+		row[21] = fmt.Sprintf("%.2f", ip.EmotionalStability)
+		row[22] = fmt.Sprintf("%.2f", ip.Intellect)
+		row[23] = ip.ExtraLabel
+		row[24] = ip.AgreLabel
+		row[25] = ip.ConsLabel
+		row[26] = ip.StabLabel
+		row[27] = ip.IntellLabel
+		row[28] = fmt.Sprintf("%d", ip.ExtraversionSum)
+		row[29] = fmt.Sprintf("%d", ip.AgreeablenessSum)
+		row[30] = fmt.Sprintf("%d", ip.ConscientiousnessSum)
+		row[31] = fmt.Sprintf("%d", ip.EmotionalStabilitySum)
+		row[32] = fmt.Sprintf("%d", ip.IntellectSum)
 	}
 
-	if err := writer.Write(header); err != nil {
-		return "", fmt.Errorf("failed to write CSV header: %w", err)
-	}
-
-	// Write data
-	record := []string{
-		participant.ID,
-		participant.Name,
-		fmt.Sprintf("%d", participant.Age),
-		participant.Gender,
-		participant.CreatedAt.Format("2006-01-02 15:04:05"),
-	}
-
-	if score != nil && score.SRQScore != nil {
-		substanceUse := "No"
-		if score.SRQScore.SubstanceUse {
-			substanceUse = "Yes"
-		}
-		psychotic := "No"
-		if score.SRQScore.Psychotic {
-			psychotic = "Yes"
-		}
-		ptsd := "No"
-		if score.SRQScore.PTSD {
-			ptsd = "Yes"
-		}
-
-		record = append(record,
-			fmt.Sprintf("%d", score.SRQScore.NeuroticScore),
-			score.SRQScore.NeuroticStatus,
-			substanceUse,
-			psychotic,
-			ptsd,
-			getSRQClass(score.SRQScore),
-		)
-	}
-
-	if score != nil && score.IPIPScore != nil {
-		record = append(record,
-			fmt.Sprintf("%d", score.IPIPScore.Extraversion),
-			fmt.Sprintf("%d", score.IPIPScore.Agreeableness),
-			fmt.Sprintf("%d", score.IPIPScore.Conscientiousness),
-			fmt.Sprintf("%d", score.IPIPScore.EmotionalStability),
-			fmt.Sprintf("%d", score.IPIPScore.Intellect),
-			getIPIPClass(score.IPIPScore),
-		)
-	}
-
-	if err := writer.Write(record); err != nil {
-		return "", fmt.Errorf("failed to write CSV record: %w", err)
-	}
-	writer.Flush()
-	if err := writer.Error(); err != nil {
-		return "", fmt.Errorf("failed to flush CSV writer: %w", err)
-	}
-
-	return builder.String(), nil
+	return row
 }
 
-// ExportMultipleToCSV exports multiple participants data to CSV
-func ExportMultipleToCSV(
-	participants []*models.Participant,
-	scores []*models.Score,
-) (string, error) {
-	var builder strings.Builder
-	writer := csv.NewWriter(&builder)
-
-	// Write header
-	header := []string{
-		"Participant ID",
-		"Name",
-		"Age",
-		"Gender",
-		"Created At",
-		"SRQ Neurotic Score",
-		"SRQ Neurotic Status",
-		"SRQ Substance Use",
-		"SRQ Psychotic",
-		"SRQ PTSD",
-		"SRQ Classification",
-		"IPIP Extraversion",
-		"IPIP Agreeableness",
-		"IPIP Conscientiousness",
-		"IPIP Emotional Stability",
-		"IPIP Intellect",
-		"IPIP Dominant Trait",
+// boolStr converts a bool to "Ya"/"Tidak" for the Indonesian CSV output.
+func boolStr(b bool) string {
+	if b {
+		return "Ya"
 	}
-
-	if err := writer.Write(header); err != nil {
-		return "", fmt.Errorf("failed to write CSV header: %w", err)
-	}
-
-	// Write records
-	for i, participant := range participants {
-		record := []string{
-			participant.ID,
-			participant.Name,
-			fmt.Sprintf("%d", participant.Age),
-			participant.Gender,
-			participant.CreatedAt.Format("2006-01-02 15:04:05"),
-			"", "", "No", "No", "No", "-",
-			"0", "0", "0", "0", "0", "-",
-		}
-
-		if i < len(scores) && scores[i] != nil {
-			score := scores[i]
-			if score.SRQScore != nil {
-				substanceUse := "No"
-				if score.SRQScore.SubstanceUse {
-					substanceUse = "Yes"
-				}
-				psychotic := "No"
-				if score.SRQScore.Psychotic {
-					psychotic = "Yes"
-				}
-				ptsd := "No"
-				if score.SRQScore.PTSD {
-					ptsd = "Yes"
-				}
-
-				record[5] = fmt.Sprintf("%d", score.SRQScore.NeuroticScore)
-				record[6] = score.SRQScore.NeuroticStatus
-				record[7] = substanceUse
-				record[8] = psychotic
-				record[9] = ptsd
-				record[10] = getSRQClass(score.SRQScore)
-			}
-
-			if score.IPIPScore != nil {
-				record[11] = fmt.Sprintf("%d", score.IPIPScore.Extraversion)
-				record[12] = fmt.Sprintf("%d", score.IPIPScore.Agreeableness)
-				record[13] = fmt.Sprintf("%d", score.IPIPScore.Conscientiousness)
-				record[14] = fmt.Sprintf("%d", score.IPIPScore.EmotionalStability)
-				record[15] = fmt.Sprintf("%d", score.IPIPScore.Intellect)
-				record[16] = getIPIPClass(score.IPIPScore)
-			}
-		}
-
-		if err := writer.Write(record); err != nil {
-			return "", fmt.Errorf("failed to write CSV record: %w", err)
-		}
-	}
-
-	writer.Flush()
-	if err := writer.Error(); err != nil {
-		return "", fmt.Errorf("failed to flush CSV writer: %w", err)
-	}
-
-	return builder.String(), nil
-}
-
-func getSRQClass(s *models.SRQScore) string {
-	if s == nil {
-		return "-"
-	}
-	var flags []string
-	if s.NeuroticScore >= 5 {
-		flags = append(flags, "Indikasi GME")
-	}
-	if s.SubstanceUse {
-		flags = append(flags, "Penggunaan Zat")
-	}
-	if s.Psychotic {
-		flags = append(flags, "Gejala Psikotik")
-	}
-	if s.PTSD {
-		flags = append(flags, "Gejala PTSD")
-	}
-	if len(flags) > 0 {
-		return strings.Join(flags, " | ")
-	}
-	return "Normal"
-}
-
-func getIPIPClass(s *models.IPIPScore) string {
-	if s == nil {
-		return "-"
-	}
-	maxVal := s.Extraversion
-	dominant := "Extraversion"
-	
-	if s.Agreeableness > maxVal {
-		maxVal = s.Agreeableness
-		dominant = "Agreeableness"
-	}
-	if s.Conscientiousness > maxVal {
-		maxVal = s.Conscientiousness
-		dominant = "Conscientiousness"
-	}
-	if s.EmotionalStability > maxVal {
-		maxVal = s.EmotionalStability
-		dominant = "Emotional Stability"
-	}
-	if s.Intellect > maxVal {
-		maxVal = s.Intellect
-		dominant = "Intellect"
-	}
-	return dominant
+	return "Tidak"
 }

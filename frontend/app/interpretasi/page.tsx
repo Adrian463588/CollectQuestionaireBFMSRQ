@@ -39,9 +39,11 @@ function getSRQClass(s: DashboardItem["score"]): string {
 function getDominantTrait(s: DashboardItem["score"]): string {
   const ipip = s?.ipip_score;
   if (!ipip) return "-";
-  return IPIP_DIMS.reduce((best, dim) =>
-    ipip[dim.key] > (ipip[best.key as keyof typeof ipip] ?? 0) ? dim : best
-  ).label;
+  return IPIP_DIMS.reduce((best, dim) => {
+    const a = Number(ipip[dim.key] ?? 0);
+    const b = Number(ipip[best.key as keyof typeof ipip] ?? 0);
+    return a > b ? dim : best;
+  }).label;
 }
 
 function hasSevereFlag(s: DashboardItem["score"]): boolean {
@@ -82,9 +84,9 @@ export default function InterpretasiPage() {
   const avgIPIP = IPIP_DIMS.map((dim) => ({
     subject: dim.label.split(" ")[0],
     value: withIPIP.length
-      ? withIPIP.reduce((acc, d) => acc + (d.score!.ipip_score![dim.key] ?? 0), 0) / withIPIP.length
+      ? withIPIP.reduce((acc, d) => acc + Number(d.score!.ipip_score![dim.key] ?? 0), 0) / withIPIP.length
       : 0,
-    fullMark: 50,
+    fullMark: 5,
     color: dim.color,
   }));
 
@@ -183,7 +185,7 @@ export default function InterpretasiPage() {
                 <RadarChart cx="50%" cy="50%" outerRadius="75%" data={avgIPIP}>
                   <PolarGrid stroke="#e2e8f0" />
                   <PolarAngleAxis dataKey="subject" tick={{ fill: "#64748b", fontSize: 12, fontWeight: 700 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 50]} tick={{ fill: "#94a3b8", fontSize: 10 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fill: "#94a3b8", fontSize: 10 }} />
                   <Radar name="Rata-rata" dataKey="value" stroke="#4a8fe7" fill="#59d2fe" fillOpacity={0.45} strokeWidth={2} />
                   <Tooltip
                     contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0", fontSize: 13 }}
@@ -192,7 +194,7 @@ export default function InterpretasiPage() {
                 </RadarChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-xs text-center text-slate-400 font-medium mt-3">Skala 10–50 per dimensi</p>
+            <p className="text-xs text-center text-slate-400 font-medium mt-3">Skala Mean 1–5 per dimensi</p>
           </BentoCard>
 
           {/* SRQ Bar */}
@@ -278,7 +280,7 @@ export default function InterpretasiPage() {
                         ) : <span className="text-slate-300">—</span>}
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className={`text-xs font-bold ${severe ? "text-red-500" : srq?.neurotic_score! >= 5 ? "text-amber-500" : "text-emerald-600"}`}>
+                        <span className={`text-xs font-bold ${severe ? "text-red-500" : (srq?.neurotic_score ?? 0) >= 5 ? "text-amber-500" : "text-emerald-600"}`}>
                           {getSRQClass(item.score)}
                         </span>
                       </td>

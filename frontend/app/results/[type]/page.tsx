@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { getParticipantScores } from "@/lib/api";
 import { getParticipantFromSession } from "@/lib/participant";
 import { Score } from "@/types";
 import { BentoCard } from "@/components/ui/BentoCard";
 import { Button } from "@/components/ui/Button";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
 
 // ── Scoring helpers ───────────────────────────────────────────────────────────
 
@@ -96,9 +96,6 @@ export default function ResultsPage({ params }: { params: Promise<{ type: string
     value: ipip ? ipip[d.key] : 0,
     fullMark: 50,
   }));
-
-  // SRQ bar data
-  const srqBarData = srq ? [{ name: "Neurotic", score: srq.neurotic_score, max: 20 }] : [];
 
   const exportUrl = `${API_BASE}/export/${participantId}`;
 
