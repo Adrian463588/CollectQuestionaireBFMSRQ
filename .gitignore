@@ -45,3 +45,6 @@ yarn-error.log*
 # Deployment Documentation
 DEPLOYMENT.md
 DEPLOY_SUPABASE_EDGEONE.md
+start.bat
+setup.bat
+QUICKSTART.md
