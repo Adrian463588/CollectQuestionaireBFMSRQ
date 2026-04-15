@@ -43,6 +43,7 @@ func LoadConfig() *Config {
 func (c *Config) GetDatabaseURL() string {
 	if c.DatabaseURL != "" {
 		return c.DatabaseURL
+	}
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		c.DBUser, c.DBPassword, c.DBHost, c.DBPort, c.DBName,
