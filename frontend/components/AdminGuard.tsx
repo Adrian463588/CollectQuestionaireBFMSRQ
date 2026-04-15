@@ -14,10 +14,6 @@ export function AdminGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setIsMounted(true);
-    const authStatus = sessionStorage.getItem("adminAuth");
-    if (authStatus === "true") {
-      setIsAuthenticated(true);
-    }
   }, []);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -25,7 +21,6 @@ export function AdminGuard({ children }: { children: ReactNode }) {
     const correctPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Admin123";
 
     if (password === correctPassword) {
-      sessionStorage.setItem("adminAuth", "true");
       setIsAuthenticated(true);
       setError("");
     } else {
