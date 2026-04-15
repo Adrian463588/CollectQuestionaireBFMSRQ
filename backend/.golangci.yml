@@ -1,0 +1,67 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - gofmt
+    - govet
+    - goimports
+    - errcheck
+    - staticcheck
+    - ineffassign
+    - gosimple
+    - misspell
+    - nakedret
+    - unconvert
+    - gocyclo
+    - gocritic
+    - revive
+    - prealloc
+
+linters-settings:
+  gofmt:
+    simplify: true
+
+  govet:
+    enable:
+      - shadow
+
+  gocyclo:
+    min-complexity: 15
+
+  goimports:
+    local-prefixes: backend
+
+  misspell:
+    locale: US
+
+  errcheck:
+    check-type-assertions: true
+    check-blank: false
+
+  revive:
+    rules:
+      - name: exported
+        disabled: false
+      - name: var-naming
+        disabled: false
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on test files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - gosec
+
+  exclude-use-default: false
+  max-issues-per-linter: 50
+  max-same-issues: 10
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
