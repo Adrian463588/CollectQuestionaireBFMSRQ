@@ -85,7 +85,7 @@ func run() error {
 	api.Get("/dashboard", handler.GetDashboardData)
 
 	// Health check
-	app.Get("/health", func(c *fiber.Ctx) error {
+	api.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})
 
