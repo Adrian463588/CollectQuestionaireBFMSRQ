@@ -48,3 +48,5 @@ DEPLOY_SUPABASE_EDGEONE.md
 start.bat
 setup.bat
 QUICKSTART.md
+AGENTS.md
+Procfile
