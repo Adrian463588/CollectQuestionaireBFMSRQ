@@ -50,3 +50,6 @@ setup.bat
 QUICKSTART.md
 AGENTS.md
 Procfile
+
+DEPLOY_HEROKU.md
+Sprint2.md
