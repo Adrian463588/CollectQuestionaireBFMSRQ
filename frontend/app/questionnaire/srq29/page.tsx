@@ -58,7 +58,7 @@ export default function SRQ29Questionnaire() {
   const answeredCount = Object.keys(answers).length;
   const progress = (answeredCount / srq29Questions.length) * 100;
   const isFinished = answeredCount === srq29Questions.length;
-  const currentAnswered = answers[currentQuestion.toString()];
+  const currentAnswered = answers[currentQ?.id?.toString()];
 
   return (
     <main className="min-h-screen bg-bgLight relative flex items-center justify-center p-4 overflow-hidden">
