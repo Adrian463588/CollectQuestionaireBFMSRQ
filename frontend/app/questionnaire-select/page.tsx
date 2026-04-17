@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { BentoCard } from "@/components/ui/BentoCard";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 export default function QuestionnaireSelect() {
   const router = useRouter();
@@ -32,6 +33,10 @@ export default function QuestionnaireSelect() {
       <AnimatedBackground />
 
       <div className="max-w-4xl w-full relative z-10">
+        <Breadcrumb items={[
+          { label: "Home", href: "/" },
+          { label: "Pilih Kuesioner" },
+        ]} />
         <div className="mb-12 text-center">
           <span className="bg-palette5/10 text-palette5 font-bold tracking-widest text-xs px-3 py-1 rounded-full uppercase">Kustomisasi Pilihan</span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-textMain mt-4 tracking-tight">

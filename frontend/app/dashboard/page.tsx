@@ -12,6 +12,7 @@ import { BentoCard } from "@/components/ui/BentoCard";
 import { Button } from "@/components/ui/Button";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
 import { AdminGuard } from "@/components/AdminGuard";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 // ── Label helpers ─────────────────────────────────────────────────────────────
 
@@ -237,6 +238,10 @@ export default function DashboardPage() {
           transition={{ duration: 0.35 }}
           className="max-w-7xl mx-auto px-4 py-10 relative z-10 space-y-6"
         >
+          <Breadcrumb items={[
+            { label: "Home", href: "/" },
+            { label: "Panel Admin" },
+          ]} />
           {/* ── Header ─────────────────────────────────────────────────── */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4
                           bg-white/60 backdrop-blur-sm border border-white rounded-3xl p-6 shadow-sm">

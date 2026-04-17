@@ -11,6 +11,7 @@ import { BentoCard } from "@/components/ui/BentoCard";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 export default function SRQ29Questionnaire() {
   const router = useRouter();
@@ -64,6 +65,11 @@ export default function SRQ29Questionnaire() {
       <AnimatedBackground />
 
       <BentoCard className="max-w-2xl w-full">
+        <Breadcrumb items={[
+          { label: "Home", href: "/" },
+          { label: "Pilih Kuesioner", href: "/questionnaire-select" },
+          { label: "SRQ-29" },
+        ]} />
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">

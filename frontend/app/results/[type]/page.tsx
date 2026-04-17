@@ -9,6 +9,7 @@ import { Score } from "@/types";
 import { BentoCard } from "@/components/ui/BentoCard";
 import { Button } from "@/components/ui/Button";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
 
 // ── Scoring helpers ───────────────────────────────────────────────────────────
@@ -109,16 +110,11 @@ export default function ResultsPage({ params }: { params: Promise<{ type: string
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        {/* Back */}
-        <button
-          onClick={() => router.push("/questionnaire-select")}
-          className="flex items-center gap-1.5 text-slate-400 hover:text-textMain font-semibold text-sm transition-colors group"
-        >
-          <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          Kembali
-        </button>
+        <Breadcrumb items={[
+          { label: "Home", href: "/" },
+          { label: "Pilih Kuesioner", href: "/questionnaire-select" },
+          { label: "Hasil" },
+        ]} />
 
         {/* Hero Card */}
         <BentoCard>

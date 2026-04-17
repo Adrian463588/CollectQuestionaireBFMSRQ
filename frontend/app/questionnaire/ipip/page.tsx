@@ -11,6 +11,7 @@ import { BentoCard } from "@/components/ui/BentoCard";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 const LIKERT_OPTIONS = [
   { value: 1, label: "Sangat Tidak Sesuai", short: "STS" },
@@ -72,6 +73,11 @@ export default function IPIPQuestionnaire() {
       <AnimatedBackground />
 
       <BentoCard className="max-w-3xl w-full">
+        <Breadcrumb items={[
+          { label: "Home", href: "/" },
+          { label: "Pilih Kuesioner", href: "/questionnaire-select" },
+          { label: "IPIP-BFM-50" },
+        ]} />
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">

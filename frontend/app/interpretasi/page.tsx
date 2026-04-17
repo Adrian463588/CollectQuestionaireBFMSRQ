@@ -12,6 +12,7 @@ import { BentoCard } from "@/components/ui/BentoCard";
 import { Button } from "@/components/ui/Button";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
 import { AdminGuard } from "@/components/AdminGuard";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -110,11 +111,16 @@ export default function InterpretasiPage() {
         {/* ── Header ─────────────────────────────────────────────────────── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/60 backdrop-blur-sm border border-white rounded-3xl p-6 shadow-sm">
           <div>
+            <Breadcrumb items={[
+              { label: "Home", href: "/" },
+              { label: "Panel Admin", href: "/dashboard" },
+              { label: "Interpretasi & Grafik" },
+            ]} />
             <h1 className="text-2xl md:text-3xl font-extrabold text-textMain tracking-tight">
-              Interpretasi & Grafik Kuesioner
+              Interpretasi &amp; Grafik Kuesioner
             </h1>
             <p className="text-slate-500 font-medium mt-1 text-sm">
-              {data.length} partisipan terdaftar — SRQ-29 & IPIP-BFM-50
+              {data.length} partisipan terdaftar — SRQ-29 &amp; IPIP-BFM-50
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -128,9 +134,6 @@ export default function InterpretasiPage() {
               </svg>
               Export Semua (CSV)
             </a>
-            <Button variant="outline" onClick={() => window.location.href = "/"}>
-              Home
-            </Button>
           </div>
         </div>
 
