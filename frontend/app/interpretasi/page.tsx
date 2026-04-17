@@ -216,7 +216,7 @@ export default function InterpretasiPage() {
                       contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0" }}
                       cursor={{ fill: "#f8fafc" }}
                     />
-                    <Bar dataKey="skor" name="Neurotic" radius={[6, 6, 0, 0]}>
+                    <Bar dataKey="skor" name="Neurotic" radius={[6, 6, 0, 0]} maxBarSize={60} minPointSize={5}>
                       {srqBarData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.skor >= 6 ? "#f87171" : entry.skor >= 5 ? "#fbbf24" : "#34d399"} />
                       ))}
