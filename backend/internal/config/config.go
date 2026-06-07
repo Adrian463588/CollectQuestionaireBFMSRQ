@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -27,19 +28,33 @@ func LoadConfig() *Config {
 		log.Println("No .env file found, using environment variables")
 	}
 
-	return &Config{
-		ServerPort:  getEnv("PORT", getEnv("SERVER_PORT", "8080")),
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		DBHost:      getEnv("DB_HOST", "localhost"),
-		DBPort:      getEnv("DB_PORT", "5432"),
-		DBUser:      getEnv("DB_USER", "postgres"),
-		DBPassword:  getEnv("DB_PASSWORD", "postgres"),
-		DBName:      getEnv("DB_NAME", "questionnaire_db"),
-		AllowedOrigins: []string{
+	allowedOriginsStr := os.Getenv("ALLOWED_ORIGINS")
+	var allowedOrigins []string
+	if allowedOriginsStr != "" {
+		parts := strings.Split(allowedOriginsStr, ",")
+		for _, p := range parts {
+			trimmed := strings.TrimSpace(p)
+			if trimmed != "" {
+				allowedOrigins = append(allowedOrigins, trimmed)
+			}
+		}
+	} else {
+		allowedOrigins = []string{
 			"http://localhost:3000",
 			"https://bfmsrqsurvey.edgeone.dev",
 			"https://bfmsrqsurvey.edgeone.dev/", // Just in case
-		},
+		}
+	}
+
+	return &Config{
+		ServerPort:     getEnv("PORT", getEnv("SERVER_PORT", "8080")),
+		DatabaseURL:    os.Getenv("DATABASE_URL"),
+		DBHost:         getEnv("DB_HOST", "localhost"),
+		DBPort:         getEnv("DB_PORT", "5432"),
+		DBUser:         getEnv("DB_USER", "postgres"),
+		DBPassword:     getEnv("DB_PASSWORD", "postgres"),
+		DBName:         getEnv("DB_NAME", "questionnaire_db"),
+		AllowedOrigins: allowedOrigins,
 	}
 }
 
