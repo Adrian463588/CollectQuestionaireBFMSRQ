@@ -3,9 +3,13 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Cache dependencies
+# DevSecOps/Performance optimizations for memory-constrained environments
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+
+# Cache dependencies and run npm ci quietly
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund --quiet
 
 # Copy source code
 COPY . .

@@ -1,0 +1,13 @@
+node_modules
+.next
+.swc
+out
+build
+dist
+.env*.local
+.env.production
+.env
+.gitignore
+*.log
+npm-debug.log*
+.git

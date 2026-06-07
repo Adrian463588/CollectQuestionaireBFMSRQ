@@ -1,0 +1,9 @@
+server
+tmp_server
+.env
+.env.local
+.git
+*.log
+*.exe
+*.test
+*.out
