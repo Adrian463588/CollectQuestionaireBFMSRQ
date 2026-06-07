@@ -24,6 +24,7 @@ WORKDIR /app
 
 # Install security patches/updates and set environment
 ENV NODE_ENV=production
+ENV PORT=3001
 
 # Create non-root user and group for security
 RUN addgroup --system --gid 1001 nodejs && \
@@ -42,7 +43,7 @@ RUN chown -R nextjs:nodejs /app
 USER nextjs
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3001
 
 # Start Next.js server
 CMD ["npm", "start"]
